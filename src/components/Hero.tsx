@@ -220,7 +220,7 @@ export default function Hero() {
               style={{
                 position: 'absolute', inset: -16, borderRadius: '50%', opacity: 0.5,
                 background: 'conic-gradient(from 0deg, #6366f1, #22d3ee, #06d6a0, #c084fc, #6366f1)',
-                filter: 'blur(14px)',
+                filter: 'blur(20px)',
               }}
             />
 
@@ -241,7 +241,7 @@ export default function Hero() {
                 priority
                 sizes="320px"
               />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,5,16,0.3), transparent)' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,5,16,0.4) 0%, rgba(5,5,16,0.15) 30%, transparent 60%)' }} />
             </div>
 
             {/* Floating badges */}

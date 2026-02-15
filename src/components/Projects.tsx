@@ -257,6 +257,7 @@ export default function Projects() {
               exit={{ opacity: 0, scale: 0.9, y: 40 }}
               onClick={(e) => e.stopPropagation()}
               style={{
+                position: 'relative',
                 width: '100%', maxWidth: 600, maxHeight: '85vh', overflowY: 'auto',
                 borderRadius: 24, padding: 36,
                 background: 'rgba(15,15,35,0.95)',
@@ -268,11 +269,16 @@ export default function Projects() {
               <button
                 onClick={() => setSelected(null)}
                 style={{
-                  position: 'absolute', top: 16, right: 16,
-                  background: 'rgba(255,255,255,0.08)', border: 'none',
+                  position: 'sticky', top: 0, float: 'right',
+                  zIndex: 10,
+                  background: 'rgba(255,255,255,0.1)', border: 'none',
                   borderRadius: 10, padding: 8, cursor: 'pointer',
-                  color: 'rgba(255,255,255,0.5)',
+                  color: 'rgba(255,255,255,0.6)',
+                  backdropFilter: 'blur(8px)',
+                  transition: 'background 0.2s, color 0.2s',
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#fff'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
               >
                 <FaTimes size={16} />
               </button>
