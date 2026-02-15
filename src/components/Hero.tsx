@@ -218,9 +218,9 @@ export default function Hero() {
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
               style={{
-                position: 'absolute', inset: -24, borderRadius: '50%', opacity: 0.4,
+                position: 'absolute', inset: -30, borderRadius: '50%', opacity: 0.35,
                 background: 'conic-gradient(from 0deg, #6366f1, #22d3ee, #06d6a0, #c084fc, #6366f1)',
-                filter: 'blur(28px)',
+                filter: 'blur(35px)',
               }}
             />
 
@@ -228,23 +228,28 @@ export default function Hero() {
             <div
               style={{
                 position: 'relative', width: 280, height: 280,
-                borderRadius: '50%', overflow: 'hidden',
+                borderRadius: '50%',
               }}
               className="sm:w-72 sm:h-72 lg:w-80 lg:h-80"
             >
-              <Image
-                src="/Maharaj Profile.jpg"
-                alt="Maharaj - Full Stack Developer"
-                fill
-                style={{ objectFit: 'cover' }}
-                priority
-                sizes="320px"
-              />
-              {/* Smooth radial fade that blends the image edges into the glow */}
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'radial-gradient(circle at center, transparent 55%, rgba(5,5,16,0.2) 70%, rgba(5,5,16,0.5) 85%, rgba(5,5,16,0.8) 100%)',
-              }} />
+              <div
+                style={{
+                  position: 'absolute', inset: 0,
+                  borderRadius: '50%',
+                  WebkitMaskImage: 'radial-gradient(circle at center, black 50%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,0.2) 80%, transparent 100%)',
+                  maskImage: 'radial-gradient(circle at center, black 50%, rgba(0,0,0,0.6) 65%, rgba(0,0,0,0.2) 80%, transparent 100%)',
+                  overflow: 'hidden',
+                }}
+              >
+                <Image
+                  src="/Maharaj Profile.jpg"
+                  alt="Maharaj - Full Stack Developer"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  priority
+                  sizes="320px"
+                />
+              </div>
             </div>
 
             {/* Floating badges */}

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FaGithub, FaExternalLinkAlt, FaTimes, FaRocket, FaRobot, FaBriefcase, FaHome, FaHospital, FaWater } from 'react-icons/fa';
@@ -93,8 +94,14 @@ const projects: Project[] = [
 export default function Projects() {
   const [selected, setSelected] = useState<Project | null>(null);
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 });
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setPortalRoot(document.body);
+  }, []);
 
   return (
+    <>
     <section
       id="projects"
       ref={ref}
@@ -235,147 +242,156 @@ export default function Projects() {
         </div>
       </div>
 
-      {/* Project modal */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelected(null)}
-            style={{
-              position: 'fixed', inset: 0, zIndex: 50,
-              background: 'rgba(0,0,0,0.7)',
-              backdropFilter: 'blur(8px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 24,
-            }}
-          >
+    </section>
+
+      {/* Project modal - rendered via portal to avoid overflow:hidden clipping */}
+      {portalRoot && createPortal(
+        <AnimatePresence>
+          {selected && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 40 }}
-              onClick={(e) => e.stopPropagation()}
+              key="project-modal-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setSelected(null)}
               style={{
-                position: 'relative',
-                width: '100%', maxWidth: 600, maxHeight: '85vh',
-                borderRadius: 24,
-                background: 'rgba(15,15,35,0.95)',
-                border: `1px solid ${selected.color}33`,
-                boxShadow: `0 0 40px ${selected.color}22`,
-                display: 'flex', flexDirection: 'column',
+                position: 'fixed', inset: 0, zIndex: 9999,
+                background: 'rgba(0,0,0,0.75)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: 24,
               }}
             >
-              {/* Close - positioned outside scrollable area */}
-              <button
-                onClick={() => setSelected(null)}
+              <motion.div
+                key="project-modal-content"
+                initial={{ opacity: 0, scale: 0.92, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 30 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                onClick={(e) => e.stopPropagation()}
                 style={{
-                  position: 'absolute', top: 12, right: 12,
-                  zIndex: 20,
-                  width: 36, height: 36,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(15,15,35,0.9)', border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: 10, padding: 0, cursor: 'pointer',
-                  color: 'rgba(255,255,255,0.7)',
-                  backdropFilter: 'blur(12px)',
-                  transition: 'background 0.2s, color 0.2s, transform 0.2s',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'scale(1.1)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15,15,35,0.9)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.transform = 'scale(1)'; }}
-              >
-                <FaTimes size={14} />
-              </button>
-
-              {/* Scrollable content */}
-              <div style={{ overflowY: 'auto', padding: 36 }}>
-
-              {/* Icon */}
-              <div
-                style={{
-                  width: 56, height: 56, borderRadius: 16,
-                  background: `${selected.color}18`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: 20,
+                  position: 'relative',
+                  width: '100%', maxWidth: 600, maxHeight: '85vh',
+                  borderRadius: 24,
+                  background: 'rgba(15,15,35,0.97)',
+                  border: `1px solid ${selected.color}33`,
+                  boxShadow: `0 0 60px ${selected.color}22, 0 25px 50px rgba(0,0,0,0.5)`,
+                  display: 'flex', flexDirection: 'column' as const,
+                  overflow: 'hidden',
                 }}
               >
-                <selected.icon size={26} style={{ color: selected.color }} />
-              </div>
+                {/* Close button - fixed to top-right of modal */}
+                <button
+                  onClick={() => setSelected(null)}
+                  style={{
+                    position: 'absolute', top: 12, right: 12,
+                    zIndex: 30,
+                    width: 36, height: 36,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(15,15,35,0.95)', border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: 10, padding: 0, cursor: 'pointer',
+                    color: 'rgba(255,255,255,0.8)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                    transition: 'background 0.2s, color 0.2s, transform 0.2s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,60,60,0.8)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15,15,35,0.95)'; e.currentTarget.style.color = 'rgba(255,255,255,0.8)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                >
+                  <FaTimes size={14} />
+                </button>
 
-              <h3 style={{ fontSize: 28, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>{selected.title}</h3>
-              <p style={{ fontSize: 15, color: selected.color, fontWeight: 600, marginBottom: 16 }}>{selected.tagline}</p>
-              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: 24 }}>
-                {selected.longDescription}
-              </p>
+                {/* Scrollable content */}
+                <div style={{ overflowY: 'auto', padding: 36 }}>
+                  {/* Icon */}
+                  <div
+                    style={{
+                      width: 56, height: 56, borderRadius: 16,
+                      background: `${selected.color}18`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      marginBottom: 20,
+                    }}
+                  >
+                    <selected.icon size={26} style={{ color: selected.color }} />
+                  </div>
 
-              {/* Highlights */}
-              <div style={{ marginBottom: 24 }}>
-                <h4 style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 12 }}>Key Features</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
-                  {selected.highlights.map((h) => (
-                    <div key={h} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: selected.color, flexShrink: 0 }} />
-                      {h}
+                  <h3 style={{ fontSize: 28, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>{selected.title}</h3>
+                  <p style={{ fontSize: 15, color: selected.color, fontWeight: 600, marginBottom: 16 }}>{selected.tagline}</p>
+                  <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, marginBottom: 24 }}>
+                    {selected.longDescription}
+                  </p>
+
+                  {/* Highlights */}
+                  <div style={{ marginBottom: 24 }}>
+                    <h4 style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 12 }}>Key Features</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                      {selected.highlights.map((h) => (
+                        <div key={h} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: selected.color, flexShrink: 0 }} />
+                          {h}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Tech */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+                    {selected.tech.map((t) => (
+                      <span
+                        key={t}
+                        style={{
+                          padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 500,
+                          color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                        }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Links */}
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    {selected.github && (
+                      <a
+                        href={selected.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '10px 20px', borderRadius: 12, fontSize: 14, fontWeight: 600,
+                          color: '#fff', background: 'rgba(255,255,255,0.08)',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        <FaGithub /> View Code
+                      </a>
+                    )}
+                    {selected.live && (
+                      <a
+                        href={selected.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '10px 20px', borderRadius: 12, fontSize: 14, fontWeight: 600,
+                          color: '#fff', background: selected.color,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        <FaExternalLinkAlt /> Live Demo
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              {/* Tech */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
-                {selected.tech.map((t) => (
-                  <span
-                    key={t}
-                    style={{
-                      padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 500,
-                      color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                    }}
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-
-              {/* Links */}
-              <div style={{ display: 'flex', gap: 12 }}>
-                {selected.github && (
-                  <a
-                    href={selected.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '10px 20px', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                      color: '#fff', background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <FaGithub /> View Code
-                  </a>
-                )}
-                {selected.live && (
-                  <a
-                    href={selected.live}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '10px 20px', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                      color: '#fff', background: selected.color,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <FaExternalLinkAlt /> Live Demo
-                  </a>
-                )}
-              </div>
-
-              </div>{/* end scrollable content */}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </section>
+          )}
+        </AnimatePresence>,
+        portalRoot
+      )}
+    </>
   );
 }
