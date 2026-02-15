@@ -258,30 +258,36 @@ export default function Projects() {
               onClick={(e) => e.stopPropagation()}
               style={{
                 position: 'relative',
-                width: '100%', maxWidth: 600, maxHeight: '85vh', overflowY: 'auto',
-                borderRadius: 24, padding: 36,
+                width: '100%', maxWidth: 600, maxHeight: '85vh',
+                borderRadius: 24,
                 background: 'rgba(15,15,35,0.95)',
                 border: `1px solid ${selected.color}33`,
                 boxShadow: `0 0 40px ${selected.color}22`,
+                display: 'flex', flexDirection: 'column',
               }}
             >
-              {/* Close */}
+              {/* Close - positioned outside scrollable area */}
               <button
                 onClick={() => setSelected(null)}
                 style={{
-                  position: 'sticky', top: 0, float: 'right',
-                  zIndex: 10,
-                  background: 'rgba(255,255,255,0.1)', border: 'none',
-                  borderRadius: 10, padding: 8, cursor: 'pointer',
-                  color: 'rgba(255,255,255,0.6)',
-                  backdropFilter: 'blur(8px)',
-                  transition: 'background 0.2s, color 0.2s',
+                  position: 'absolute', top: 12, right: 12,
+                  zIndex: 20,
+                  width: 36, height: 36,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(15,15,35,0.9)', border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 10, padding: 0, cursor: 'pointer',
+                  color: 'rgba(255,255,255,0.7)',
+                  backdropFilter: 'blur(12px)',
+                  transition: 'background 0.2s, color 0.2s, transform 0.2s',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#fff'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = '#fff'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(15,15,35,0.9)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; e.currentTarget.style.transform = 'scale(1)'; }}
               >
-                <FaTimes size={16} />
+                <FaTimes size={14} />
               </button>
+
+              {/* Scrollable content */}
+              <div style={{ overflowY: 'auto', padding: 36 }}>
 
               {/* Icon */}
               <div
@@ -364,6 +370,8 @@ export default function Projects() {
                   </a>
                 )}
               </div>
+
+              </div>{/* end scrollable content */}
             </motion.div>
           </motion.div>
         )}

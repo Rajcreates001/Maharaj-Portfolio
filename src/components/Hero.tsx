@@ -218,9 +218,9 @@ export default function Hero() {
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
               style={{
-                position: 'absolute', inset: -16, borderRadius: '50%', opacity: 0.5,
+                position: 'absolute', inset: -24, borderRadius: '50%', opacity: 0.4,
                 background: 'conic-gradient(from 0deg, #6366f1, #22d3ee, #06d6a0, #c084fc, #6366f1)',
-                filter: 'blur(20px)',
+                filter: 'blur(28px)',
               }}
             />
 
@@ -229,7 +229,6 @@ export default function Hero() {
               style={{
                 position: 'relative', width: 280, height: 280,
                 borderRadius: '50%', overflow: 'hidden',
-                border: '2px solid rgba(255,255,255,0.1)',
               }}
               className="sm:w-72 sm:h-72 lg:w-80 lg:h-80"
             >
@@ -241,7 +240,11 @@ export default function Hero() {
                 priority
                 sizes="320px"
               />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,5,16,0.4) 0%, rgba(5,5,16,0.15) 30%, transparent 60%)' }} />
+              {/* Smooth radial fade that blends the image edges into the glow */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'radial-gradient(circle at center, transparent 55%, rgba(5,5,16,0.2) 70%, rgba(5,5,16,0.5) 85%, rgba(5,5,16,0.8) 100%)',
+              }} />
             </div>
 
             {/* Floating badges */}
